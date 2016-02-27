@@ -13,8 +13,7 @@
 */
 #include <LBT.h>
 #include <LBTClient.h>
-#include <LWs2812.h>
-
+#include <LBTServer.h>
 
 static LBTDeviceInfo info = {0};
 boolean find = 0;
@@ -84,8 +83,14 @@ void loop()
         }
 
         char buffer[32] = {0};
-        int write_size = LBTClient.write((uint8_t*)"123456789012", 12);
+        int write_size = LBTClient.write("v 2\r\n", strlen( "v 2\r\n" ));
         ard_log("client first spec write_size [%d]", write_size);
+        int write_size2 = LBTClient.write("r 2\r\n", strlen( "r 2\r\n" )); //Android
+        ard_log("client first spec write_size [%d]", write_size2);
+        int write_size3 = LBTClient.write("% 12\r\n", strlen( "% 12\r\n" )); //EEG+Acc
+        ard_log("client first spec write_size [%d]", write_size3);
+        int write_size4 = LBTClient.write("% 12\r\n", strlen( "s\r\n" )); //EEG+Acc
+        ard_log("client first spec write_size [%d]", write_size4); //Start streaming data
 
         // to read the data from master(server)
         while(1)
@@ -100,8 +105,8 @@ void loop()
         ard_log("read size [%d][%s]", read_size, buffer);
         
 
-        write_size = LBTClient.write((uint8_t*)"LinkIt BT Client", 16);
-        ard_log("write_size [%d]", write_size);
+        //write_size = LBTClient.write((uint8_t*)"LinkIt BT Client", 16);
+        //ard_log("write_size [%d]", write_size);
         
         
         find = 0;
