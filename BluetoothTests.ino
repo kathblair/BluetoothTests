@@ -80,9 +80,12 @@ void loop()
         else
         {
             ard_log("Connect to SPP Server successfully\n");
+            LWs2812.monochrome(5, 0x00ff0000, 2000);
+            delay(2500);
         }
 
         char buffer[32] = {0};
+<<<<<<< HEAD
         int write_size = LBTClient.write("v 2\r\n", strlen( "v 2\r\n" ));
         ard_log("client first spec write_size [%d]", write_size);
         int write_size2 = LBTClient.write("r 2\r\n", strlen( "r 2\r\n" )); //Android
@@ -91,6 +94,10 @@ void loop()
         ard_log("client first spec write_size [%d]", write_size3);
         int write_size4 = LBTClient.write("% 12\r\n", strlen( "s\r\n" )); //EEG+Acc
         ard_log("client first spec write_size [%d]", write_size4); //Start streaming data
+=======
+        int write_size = LBTClient.write("v 2");
+        ard_log("test write [%d]", write_size);
+>>>>>>> origin/master
 
         // to read the data from master(server)
         while(1)
