@@ -109,11 +109,11 @@ void loop() {
     Serial.print("(BIN)\r\n");
     
     if(bytebuffer[i] == syncpacket[0] && bytebuffer[i+1] == syncpacket[1] && bytebuffer[i+2] == syncpacket[2] && bytebuffer[i+3] == syncpacket[3] ){
-       Serial.print("\t\THIS IS A SYNCHPACKET! \n");
+       Serial.print("\t THIS IS A SYNCHPACKET! \n");
        // Now I know where a sync packet is. Can I build the rest from it? Maybe first with just the order I know? will need to make something to more programattically do this though.
        // maybe I should save where this is (the I value) so I can go back to it?
        lastsynch = i;
-        i=i+3; // skip to the next item, knowing we're done syncing?
+       i=i+3; // skip to the next item, knowing we're done syncing?
     }else{
      // THIS WORKS YAYYYYYY
      byte firstnibble =  bytebuffer[i] >> 4;
@@ -143,29 +143,18 @@ void loop() {
            //The two extra bytes specify numbers of samples dropped by the Muse since the last successful package of same type. Currently only EEG and Accelerometer samples 
            //transmit information about dropped samples, as the rest of the data types are less critical.
            // make sure I'm writing this in the right order? - I think so!
-           int writeloc = 15;
-              //Serial.print("Byte that is first of dropped sample int: ");
-              //Serial.println(i+j);
-           for(int a=0; a<8; ++a){
-              int thisbit = bitRead(bytebuffer[i+j], a); // first byte of dropped sample packet
-              bitWrite(twobytestore, writeloc, thisbit);
-             --writeloc;
-          }
-          ++j; // move to next byte of sample packet
-          //Serial.println(i+j);
-           for(int a=0; a<8; ++a){
-              int thisbit = bitRead(bytebuffer[i+j], a); // second byte of sample packet
-              bitWrite(twobytestore, writeloc, thisbit);
-              --writeloc;
-          }
+         
+          twobytestore = writebytestoshort(bytebuffer[i+j], bytebuffer[i+j+1]);
+          ++j;
           Serial.print("\t 2 byte value: ");
-          Serial.println(twobytestore);
+          Serial.println(twobytestore); // this number is right!
+          //Serial.print ("bits of twobytestore: ");
           ++j; // now I should be able to keep using i+j, and then just add j to the end to move on.          
          }
          //4 byte payload. ACC Ch1: 10bits / ACC CH2: 10bits / ACC CH3 10bits / 2 unused bits.
          // so store it in unsigned short variables. I think I need to add the 0's at the beginning. So first maybe just pop the bin values in arrays?
          for(int a=0; a<4; ++a){
-           accdatabytes[a] = bytebuffer[i+j]; // ad this byte
+           accdatabytes[a] = bytebuffer[i+j]; // add this byte
            Serial.print("Adding byte: "); Serial.print(i+j); Serial.print(" as the "); Serial.print(a); Serial.println("data byte");
            ++j; // move the counter for the next one.
          }
@@ -198,7 +187,7 @@ void loop() {
          }
          // write the first channel into unsigned short accch1
          //Serial.print("Writing into the unsigned short accch1\n");
-         arrayloc = 0;
+         arrayloc = 15;
          for(int d=15; d>=0; --d){
              //Serial.print(d); Serial.print(": ");
              if(d<16 && d>9){
@@ -207,16 +196,14 @@ void loop() {
              }else{
                bitWrite(accch1, d, bitsforaccch1[arrayloc]);
                //Serial.println(bitsforaccch1[arrayloc]);
-               ++arrayloc;
+               --arrayloc;
              }
           }
          Serial.print("accch1: "); Serial.println(accch1);
-         
-         
-         
+           
          // write the second channel into unsigned short accch2
          //Serial.print("Writing into the unsigned short accch2\n");
-         arrayloc = 0;
+         arrayloc = 15;
          for(int d=15; d>=0; --d){
              //Serial.print(d); Serial.print(": ");
              if(d<16 && d>9){
@@ -225,15 +212,14 @@ void loop() {
              }else{
                bitWrite(accch2, d, bitsforaccch2[arrayloc]);
                //Serial.println(bitsforaccch1[arrayloc]);
-               ++arrayloc;
+               --arrayloc;
              }
           }
          Serial.print("accch2: "); Serial.println(accch2);
          
-         
          // write the third channel into unsigned short accch3
          //Serial.print("Writing into the unsigned short accch3\n");
-         arrayloc = 0;
+         arrayloc = 15;
          for(int d=15; d>=0; --d){
              //Serial.print(d); Serial.print(": ");
              if(d<16 && d>9){
@@ -242,7 +228,7 @@ void loop() {
              }else{
                bitWrite(accch3, d, bitsforaccch3[arrayloc]);
                //Serial.println(bitsforaccch3[arrayloc]);
-               ++arrayloc;
+               --arrayloc;
              }
           }
          Serial.print("accch3: "); Serial.println(accch3);
@@ -260,19 +246,8 @@ void loop() {
            //The two extra bytes specify numbers of samples dropped by the Muse since the last successful package of same type. Currently only EEG and Accelerometer samples 
            //transmit information about dropped samples, as the rest of the data types are less critical.
            // make sure I'm writing this in the right order? - I think so!
-           int writeloc = 15;
-           for(int a=0; a<8; ++a){
-              int thisbit = bitRead(bytebuffer[i+j], a); // first byte of dropped sample packet
-              bitWrite(twobytestore, writeloc, thisbit);
-             --writeloc;
-          }
-          ++j; // move to next byte of sample packet
-           for(int a=0; a<8; ++a){
-              bitWrite(twobytestore, writeloc, a);
-              int thisbit = bitRead(bytebuffer[i+j], a); // second byte of sample packet
-              bitWrite(twobytestore, writeloc, thisbit);
-              --writeloc;
-          }
+           twobytestore = writebytestoshort(bytebuffer[i+j], bytebuffer[i+j+1]);
+          ++j;
           Serial.print("\t 2 byte value: ");
           Serial.println(twobytestore);
           ++j; // now I should be able to keep using i+j, and then just add j to the end to move on.       
@@ -295,6 +270,101 @@ void loop() {
            Serial.println(ueegdatabytes[a]); 
          }
          
+        // write the bits into arrays of 10
+         stored = 0; // keep track of the number of bits stored.
+         for(int a=0; a<5; ++a){
+          //working with each byte.
+          //Serial.print("\t uncompressed eeg byte "); Serial.print(a); Serial.println(": ");
+          for(int b=0; b<8; ++b){
+            int thisbit = bitRead(ueegdatabytes[a], b);
+            //Serial.print("\t\t bit "); Serial.print(b); Serial.print(": "); Serial.println(thisbit);
+            if(stored<10){
+              if(stored==0){Serial.print("\nChannel 1: ");}
+              bitsforueegch1[stored]= thisbit;
+              ++stored;
+               Serial.print(thisbit);
+            }else if(stored>=10 && stored<20){
+              if(stored==0){Serial.print("\nChannel 2: ");}
+              bitsforueegch2[stored-10]=thisbit;
+              ++stored;
+            }else if(stored>=20 && stored<30){
+              if(stored==0){Serial.print("\nChannel 3: ");}
+              bitsforueegch3[stored-20]= thisbit;
+              ++stored;
+            }else if(stored>=30 && stored<40){
+              if(stored==0){Serial.print("\nChannel 4: ");}
+              bitsforueegch4[stored-30]= thisbit;
+              ++stored;
+            }else{
+              //Serial.print("\tUnused Bit: "); Serial.println(thisbit);              
+            }
+          }         
+         }
+         
+         // write the first channel into unsigned short ueegch1
+         //Serial.print("Writing into the unsigned short ueegch1\n");
+         arrayloc = 0;
+         for(int d=15; d>=0; --d){
+             //Serial.print(d); Serial.print(": ");
+             if(d<16 && d>9){
+               bitWrite(ueegch1, d, 0);
+               //Serial.println("0");
+             }else{
+               bitWrite(ueegch1, d, bitsforueegch1[arrayloc]);
+               //Serial.println(bitsforaccch1[arrayloc]);
+               ++arrayloc;
+             }
+          }
+         Serial.print("ueegch1: "); Serial.println(ueegch1);     //correct somehow.
+       
+         // write the first channel into unsigned short ueegch1
+         //Serial.print("Writing into the unsigned short ueegch1\n");
+         arrayloc = 0;
+         for(int d=15; d>=0; --d){
+             //Serial.print(d); Serial.print(": ");
+             if(d<16 && d>9){
+               bitWrite(ueegch2, d, 0);
+               //Serial.println("0");
+             }else{
+               bitWrite(ueegch2, d, bitsforueegch2[arrayloc]);
+               //Serial.println(bitsforaccch1[arrayloc]);
+               ++arrayloc;
+             }
+          }
+         Serial.print("ueegch2: "); Serial.println(ueegch2);  //incorrect
+         
+         // write the first channel into unsigned short ueegch1
+         //Serial.print("Writing into the unsigned short ueegch1\n");
+         arrayloc = 0;
+         for(int d=15; d>=0; --d){
+             //Serial.print(d); Serial.print(": ");
+             if(d<16 && d>9){
+               bitWrite(ueegch3, d, 0);
+               //Serial.println("0");
+             }else{
+               bitWrite(ueegch3, d, bitsforueegch3[arrayloc]);
+               //Serial.println(bitsforaccch1[arrayloc]);
+               ++arrayloc;
+             }
+          }
+         Serial.print("ueegch3: "); Serial.println(ueegch3); // incorrect
+         
+         // write the first channel into unsigned short ueegch1
+         //Serial.print("Writing into the unsigned short ueegch1\n");
+         arrayloc = 0;
+         for(int d=15; d>=0; --d){
+             //Serial.print(d); Serial.print(": ");
+             if(d<16 && d>9){
+               bitWrite(ueegch4, d, 0);
+               //Serial.println("0");
+             }else{
+               bitWrite(ueegch4, d, bitsforueegch4[arrayloc]);
+               //Serial.println(bitsforaccch1[arrayloc]);
+               ++arrayloc;
+             }
+          }
+         Serial.print("ueegch4: "); Serial.println(ueegch4); //incorrect
+         
          
          i = i+j-1;
          break;  
@@ -315,21 +385,8 @@ void loop() {
            //The two extra bytes specify numbers of samples dropped by the Muse since the last successful package of same type. Currently only EEG and Accelerometer samples 
            //transmit information about dropped samples, as the rest of the data types are less critical.
            // make sure I'm writing this in the right order? - I think so!
-           int writeloc = 15;
-              //Serial.print("Byte that is first of dropped sample int: ");
-              //Serial.println(i+j);
-           for(int a=0; a<8; ++a){
-              int thisbit = bitRead(bytebuffer[i+j], a); // first byte of dropped sample packet
-              bitWrite(twobytestore, writeloc, thisbit);
-             --writeloc;
-          }
-          ++j; // move to next byte of sample packet
-          //Serial.println(i+j);
-           for(int a=0; a<8; ++a){
-              int thisbit = bitRead(bytebuffer[i+j], a); // second byte of sample packet
-              bitWrite(twobytestore, writeloc, thisbit);
-              --writeloc;
-          }
+           twobytestore = writebytestoshort(bytebuffer[i+j], bytebuffer[i+j+1]);
+          ++j;
           Serial.print("\t 2 byte value: ");
           Serial.println(twobytestore);
           ++j; // now I should be able to keep using i+j, and then just add j to the end to move on.       
@@ -342,22 +399,32 @@ void loop() {
           j = 1; // this is the offset to add to i at the end of this part of the loop
          Serial.println("\t Battery packet");  
          // has no second nibble
-         for(int a=0; a<5; ++a){
-           batdatabytes[8] = bytebuffer[i+j]; // add this byte
+         for(int a=0; a<8; ++a){
+           batdatabytes[a] = bytebuffer[i+j]; // add this byte
            Serial.print("Adding byte: "); Serial.print(i+j); Serial.print(" as the "); Serial.print(a); Serial.println("data byte");
            ++j; // move the counter for the next one.
          }
-         Serial.println("\t Uncompressed EEG data bytes:"); 
+         Serial.println("\t Battery data bytes:"); 
          for(int a=0; a<8; ++a){
            Serial.print("\t\tByte "); Serial.print(a); Serial.print(": ");
            Serial.println(batdatabytes[a]); 
          }
          /* the order of the data bytes is:
          batdatabytes[0], batdatabytes[1] = battery percent, unsigned short batpercent; // 2 bytes
-         batdatabytes[2], batdatabytes[3] = fuel guage millivolts, unsigned short fuelgaugemv; // 2 bytes
+         batdatabytes[2], batdatabytes[3] = fuel millivolts, unsigned short fuelgaugemv; // 2 bytes
          batdatabytes[4], batdatabytes[5] = ADC millivolts, unsigned short fuelgaugemv; // 2 bytes
          batdatabytes[6], batdatabytes[7] = Temperature in C, unsigned short fuelgaugemv; // 2 bytes
          */
+         batpercent = writebytestoshort(batdatabytes[0], batdatabytes[2]);
+         fuelgaugemv = writebytestoshort(batdatabytes[2], batdatabytes[3]);
+         adcmv = writebytestoshort(batdatabytes[4], batdatabytes[5]);
+         tempc = writebytestoshort(batdatabytes[6], batdatabytes[7]);
+         
+         Serial.print("Battery Percent: "); Serial.println(batpercent);
+         Serial.print("Fuel MV: "); Serial.println(fuelgaugemv);
+         Serial.print("ADC MV: "); Serial.println(adcmv);
+         Serial.print("Temp in C: "); Serial.println(tempc);
+         // ++j; // now I should be able to keep using i+j, and then just add j to the end to move on.          
          
          i = i+j-1;
          break;  
@@ -386,10 +453,6 @@ void loop() {
 //delay(5000);
 }
 
-// I want this function to basically figure out what packet I'm in. So I guess I need to start with the first 
-char buildpacket(byte buffer, int i){
-  //get the first nibble of the first byte
-  //byte fnibble = buffer[i] << 4;
-}
+
 
 
