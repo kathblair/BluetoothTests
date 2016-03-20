@@ -1,0 +1,38 @@
+byte0: FF(HEX) / 
+byte1: FF(HEX) / 
+byte2: AA(HEX) / 
+byte3: 55(HEX) / 
+
+byte4: A8(HEX) / 
+byte5: 1(HEX) / 
+byte6: 43(HEX) / 
+byte7: 66(HEX) / 
+byte8: BC(HEX) / 
+byte9: B3(HEX) / 
+byte10: 0(HEX) / 
+
+
+byte11: B0(HEX) / 
+byte12: 23(HEX) / 
+byte13: F7(HEX) / 
+byte14: F(HEX) / 
+byte15: F7(HEX) / 
+byte16: F(HEX) / 
+byte17: EE(HEX) / 
+byte18: 0(HEX) / 
+byte19: 1F(HEX) / 
+
+
+byte20: E8(HEX) / 
+byte21: 0(HEX) / 
+byte22: 12(HEX) / 
+byte23: E7(HEX) / 
+byte24: 81(HEX) / 
+byte25: 47(HEX) / 
+byte26: DC(HEX) / 
+byte27: 81(HEX) / 
+
+byte28: A0(HEX) / 
+byte29: 66(HEX) / 
+byte30: BC(HEX) / 
+byte31: B3(HEX) / 

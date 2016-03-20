@@ -1,0 +1,54 @@
+How BITWRITE works
+
+How BITREAD works
+
+
+SYNC PACKET
+FF FF AA 55
+
+Accelerometer Packet - A
+8 - packets have been dropped
+Two-byte short: 1 43
+0000 0001 0100 0011  / 323 /  getting 32962
+1000 0000 1100 0010
+
+data: 3 channels, 10 bits each
+byte7: 66(HEX) / 0110 0110
+byte8: BC(HEX) / 10|11 1100
+byte9: B3(HEX) / 1011 | 0011
+byte10: 0(HEX) / 0000 00 | 00
+ch1: 0000 0001 1001 1010 - 410 // no
+ch2: 0000 0011 1100 1011 - 971 // no
+ch3: 0000 0000 1100 0000 - 192 // no
+
+Battery Packet - B
+0 - no dropped packets
+battery percent: 23 F7 / 0010 0011 1111 0111 - 9207 // ???
+Fuel Gauge MV: F F7 / 0000 1111 1111 0111 - 4087 // correct
+ADC MVD: F EE / 0000 1111 1110 1110 - 4078 // correct
+Temp in C: 0 1F / 0000 0000 0001 1111 - 31 // correct
+
+
+Uncompressed EEG Packet - E -- MISSING BYTE 20. J should not go up as much?
+8 - packets have been dropped
+two-byte short: 0 12 / 0000 0000 0001 0010 - 18 // this number is RIGHT!!!
+(bytes 21, 22)
+
+5 bytes of eeg data, 4 channels, 10 bit packages.
+byte23: E7(HEX) / 1110 0111
+byte24: 81(HEX) / 10|00 0001
+byte25: 47(HEX) / 0100 | 0111
+byte26: DC(HEX) / 1101 11 | 00
+byte27: 81(HEX) / 1000 0001
+ch1: 0000 0011 1001 1110 - 926 
+ch2: 0000 0000 0001 0100 - 020
+ch3: 0000 0001 1111 0111 - 503
+ch4: 0000 0000 1000 0001 - 129
+
+
+Accelerometer Packet A
+0 NO PACKETS DROPPED 
+byte29: 66(HEX) / 0110 0110
+byte30: BC(HEX) / 1011 1100
+byte31: B3(HEX) / 1011 0011
+- missing last byte here 

@@ -1,0 +1,22 @@
+//uncompressed EEG vars - HAVE
+  unsigned short ueegch1;
+  unsigned short ueegch2;
+  unsigned short ueegch3;
+  unsigned short ueegch4;
+  int bitsforueegch1[10];
+  int bitsforueegch2[10];
+  int bitsforueegch3[10];
+  int bitsforueegch4[10];
+  byte ueegheaderbytes[3]; // 1 to 3 bytes is the length of the header. Based on whether there are dropped packets.
+  byte ueegdatabytes[5]; // 5 byte data payload in 10 bit groups
+  
+  
+// Battery vars -- HAVE
+  unsigned short batpercent; // 2 bytes
+  unsigned short fuelgaugemv; // 2 bytes
+  unsigned short adcmv; // 2 bytes
+  unsigned short tempc; // 2 bytes
+  // can just write to the bytes because it's nice and even! like in errors
+  byte batheadbytes[1]; // header is 1 byte
+  byte batdatabytes[8]; // payload is 8 bytes
+  
