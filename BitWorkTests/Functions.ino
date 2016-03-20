@@ -16,6 +16,28 @@ unsigned short writebytestoshort(byte byte1, byte byte2){
   return target;
 }
 
+unsigned short tenbitstotwobytes(int bitarray[10]){
+  // write the first channel into unsigned short accch1
+  unsigned short target;
+  Serial.print("Writing into the unsigned short ");
+  arrayloc = 0; // STARTING FROM THE BEGINNING
+  for(int d=15; d>=0; --d){ // d is the locaiton in the bits to write
+    //Serial.print(d); Serial.print(": ");
+    if(d<16 && d>9){
+      bitWrite(target, d, 0);
+      Serial.print("0");
+    }else{
+      bitWrite(target, d, bitarray[arrayloc]);
+      Serial.print(bitarray[arrayloc]);
+      arrayloc++;
+    }
+    //Serial.print(" ");
+  }
+  Serial.println();
+  Serial.print("target: "); Serial.println(target);
+  return target;
+}
+
 // I want this function to basically figure out what packet I'm in. So I guess I need to start with the first 
 char buildpacket(byte buffer, int i){
   //get the first nibble of the first byte

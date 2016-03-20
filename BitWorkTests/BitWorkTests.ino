@@ -10,9 +10,9 @@ int arrayloc = 0;
 int lastsynch;
 
 // accelerometer vars - HAVE
-  unsigned short accch1;
-  unsigned short accch2;
-  unsigned short accch3;
+  unsigned short accch1 = 0;
+  unsigned short accch2 = 0;
+  unsigned short accch3 = 0;
   int bitsforaccch1[10];
   int bitsforaccch2[10];
   int bitsforaccch3[10];
@@ -168,9 +168,9 @@ void loop() {
          for(int a=0; a<4; ++a){
           //working with each byte.
           //Serial.print("\t Accelerometer byte "); Serial.print(a); Serial.println(": ");
-          for(int b=0; b<8; ++b){
+          for(int b=7; b>=0; --b){
             int thisbit = bitRead(accdatabytes[a], b);
-            //Serial.print("\t\t bit "); Serial.print(b); Serial.print(": "); Serial.println(thisbit);
+            //Serial.print("\t\t stored at "); Serial.print(stored); Serial.print("  bit "); Serial.print(b); Serial.print(": "); Serial.println(thisbit);
             if(stored<10){
               bitsforaccch1[stored]= thisbit;
               ++stored;
@@ -185,52 +185,38 @@ void loop() {
             }
           }         
          }
+         
+         Serial.println("bitsforaccch1: ");
+         for(i=0; i<10; i++){
+           Serial.print(bitsforaccch1[i]);
+         }
+         Serial.println();
+         
+         Serial.println("bitsforaccch2: ");
+         for(i=0; i<10; i++){
+           Serial.print(bitsforaccch2[i]);
+         }
+         Serial.println();
+         
+         Serial.println("bitsforaccch3: ");
+         for(i=0; i<10; i++){
+           Serial.print(bitsforaccch3[i]);
+         }
+         Serial.println();
+         
          // write the first channel into unsigned short accch1
-         //Serial.print("Writing into the unsigned short accch1\n");
-         arrayloc = 15;
-         for(int d=15; d>=0; --d){
-             //Serial.print(d); Serial.print(": ");
-             if(d<16 && d>9){
-               bitWrite(accch1, d, 0);
-               //Serial.println("0");
-             }else{
-               bitWrite(accch1, d, bitsforaccch1[arrayloc]);
-               //Serial.println(bitsforaccch1[arrayloc]);
-               --arrayloc;
-             }
-          }
+         Serial.print("Writing into the unsigned short accch1\n");
+         accch1 = tenbitstotwobytes(bitsforaccch1);
          Serial.print("accch1: "); Serial.println(accch1);
            
          // write the second channel into unsigned short accch2
-         //Serial.print("Writing into the unsigned short accch2\n");
-         arrayloc = 15;
-         for(int d=15; d>=0; --d){
-             //Serial.print(d); Serial.print(": ");
-             if(d<16 && d>9){
-               bitWrite(accch2, d, 0);
-               //Serial.println("0");
-             }else{
-               bitWrite(accch2, d, bitsforaccch2[arrayloc]);
-               //Serial.println(bitsforaccch1[arrayloc]);
-               --arrayloc;
-             }
-          }
+         Serial.print("Writing into the unsigned short accch2\n");
+         accch2 = tenbitstotwobytes(bitsforaccch2);
          Serial.print("accch2: "); Serial.println(accch2);
          
          // write the third channel into unsigned short accch3
-         //Serial.print("Writing into the unsigned short accch3\n");
-         arrayloc = 15;
-         for(int d=15; d>=0; --d){
-             //Serial.print(d); Serial.print(": ");
-             if(d<16 && d>9){
-               bitWrite(accch3, d, 0);
-               //Serial.println("0");
-             }else{
-               bitWrite(accch3, d, bitsforaccch3[arrayloc]);
-               //Serial.println(bitsforaccch3[arrayloc]);
-               --arrayloc;
-             }
-          }
+         Serial.print("Writing into the unsigned short accch3\n");
+         accch3 = tenbitstotwobytes(bitsforaccch3);
          Serial.print("accch3: "); Serial.println(accch3);
 
          // move the counter past bytes we've read. Must have already upped it one.
@@ -275,7 +261,7 @@ void loop() {
          for(int a=0; a<5; ++a){
           //working with each byte.
           //Serial.print("\t uncompressed eeg byte "); Serial.print(a); Serial.println(": ");
-          for(int b=0; b<8; ++b){
+          for(int b=7; b>=0; --b){
             int thisbit = bitRead(ueegdatabytes[a], b);
             //Serial.print("\t\t bit "); Serial.print(b); Serial.print(": "); Serial.println(thisbit);
             if(stored<10){
@@ -302,67 +288,23 @@ void loop() {
          }
          
          // write the first channel into unsigned short ueegch1
-         //Serial.print("Writing into the unsigned short ueegch1\n");
-         arrayloc = 0;
-         for(int d=15; d>=0; --d){
-             //Serial.print(d); Serial.print(": ");
-             if(d<16 && d>9){
-               bitWrite(ueegch1, d, 0);
-               //Serial.println("0");
-             }else{
-               bitWrite(ueegch1, d, bitsforueegch1[arrayloc]);
-               //Serial.println(bitsforaccch1[arrayloc]);
-               ++arrayloc;
-             }
-          }
+         Serial.print("Writing into the unsigned short ueegch1\n");
+         ueegch1 = tenbitstotwobytes(bitsforueegch1);
          Serial.print("ueegch1: "); Serial.println(ueegch1);     //correct somehow.
        
          // write the first channel into unsigned short ueegch1
-         //Serial.print("Writing into the unsigned short ueegch1\n");
-         arrayloc = 0;
-         for(int d=15; d>=0; --d){
-             //Serial.print(d); Serial.print(": ");
-             if(d<16 && d>9){
-               bitWrite(ueegch2, d, 0);
-               //Serial.println("0");
-             }else{
-               bitWrite(ueegch2, d, bitsforueegch2[arrayloc]);
-               //Serial.println(bitsforaccch1[arrayloc]);
-               ++arrayloc;
-             }
-          }
+         Serial.print("Writing into the unsigned short ueegch2\n");
+         ueegch2 = tenbitstotwobytes(bitsforueegch2);
          Serial.print("ueegch2: "); Serial.println(ueegch2);  //incorrect
          
          // write the first channel into unsigned short ueegch1
-         //Serial.print("Writing into the unsigned short ueegch1\n");
-         arrayloc = 0;
-         for(int d=15; d>=0; --d){
-             //Serial.print(d); Serial.print(": ");
-             if(d<16 && d>9){
-               bitWrite(ueegch3, d, 0);
-               //Serial.println("0");
-             }else{
-               bitWrite(ueegch3, d, bitsforueegch3[arrayloc]);
-               //Serial.println(bitsforaccch1[arrayloc]);
-               ++arrayloc;
-             }
-          }
+         Serial.print("Writing into the unsigned short ueegch3\n");
+         ueegch3 = tenbitstotwobytes(bitsforueegch3);
          Serial.print("ueegch3: "); Serial.println(ueegch3); // incorrect
          
          // write the first channel into unsigned short ueegch1
-         //Serial.print("Writing into the unsigned short ueegch1\n");
-         arrayloc = 0;
-         for(int d=15; d>=0; --d){
-             //Serial.print(d); Serial.print(": ");
-             if(d<16 && d>9){
-               bitWrite(ueegch4, d, 0);
-               //Serial.println("0");
-             }else{
-               bitWrite(ueegch4, d, bitsforueegch4[arrayloc]);
-               //Serial.println(bitsforaccch1[arrayloc]);
-               ++arrayloc;
-             }
-          }
+         Serial.print("Writing into the unsigned short ueegch4\n");
+         ueegch4 = tenbitstotwobytes(bitsforueegch4);
          Serial.print("ueegch4: "); Serial.println(ueegch4); //incorrect
          
          
